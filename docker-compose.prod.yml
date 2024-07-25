@@ -11,8 +11,8 @@ services:
       - 80:5173
     volumes:
       - ./frontend/src:/app/src 
-    #environment:
-      #VITE_API_URL: http://localhost:3000
+    environment:
+      VITE_API_URL: http://localhost:3000
 
   # backend
   api:
