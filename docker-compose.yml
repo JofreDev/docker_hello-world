@@ -1,40 +1,63 @@
+# Se usa de tipo String por el versionado '1.0.1' por ejemplo. Esto ya no es obligatorio
 version: "3.8"
 
+# Se define la construccion de imagenes/contenedores que ejecutaremos con 'services'
+  # Estructura importante para asegurar comunicacion
 services:
+  # front
   app:
     build: ./frontend
     ports:
       - 80:5173
     volumes:
-      - ./frontend/src:/app/src
+      - ./frontend/src:/app/src 
     environment:
       VITE_API_URL: http://localhost:3000
+
+  # backend
   api:
+    # Aca nos basamos en un dockerfile, por lo tanto se usa 'build'
     build: ./backend
+    ## Puerto referenciado desde EXPOSE de Dockerfile
     ports:
       - 3000:3000
+    # variable de entorno 
     environment:
+      # <variable_entorno>=mongodb://<nombre_container>/<nombre_db>  
       DB_URL: mongodb://db/gamify
     volumes:
+      ## El codigo src esta en 'app'
+      ## Volumen anonimo
       - ./backend/app:/app/app
     depends_on:
       - db
-  api-tests:
-    image: holamundo-api
+
+  api-test:
+    # Reutilizamos la imagen que se crea a partir de api
+    image: holamundo_api
     environment:
       DB_URL: mongodb://db/gamifytest
     volumes:
       - ./backend/app:/app/app
       - ./backend/tests:/app/tests
     depends_on:
-      - db
+      - db  
+    ## Comando que sobreescribe al del dockerfile
     command: npm test
+
+  # database
   db:
+    # Se usa 'image' para usar una imagen publica o basarse en una imagen hecha
     image: mongo:5.0.19-focal
+    # Se indica mapeo de puertos con 'ports'
     ports:
       - 27017:27017
     volumes:
+      # volumen:ruta del volumen dentro del container 
+      # volumen nombrado        
       - gamify:/data/db
 
+# volume a nivel de service
 volumes:
+  # Se indica el nombre 'gamify' en este caso. A la derecha no es necesario poner nada 
   gamify:
