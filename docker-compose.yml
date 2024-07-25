@@ -60,4 +60,4 @@ services:
 # volume a nivel de service
 volumes:
   # Se indica el nombre 'gamify' en este caso. A la derecha no es necesario poner nada 
-  gamify:
+  gamify: 
