@@ -6,13 +6,19 @@ version: "3.8"
 services:
   # front
   app:
-    build: ./frontend
+    build: 
+      ## Donde se encuentra el directorio que contiene la aplicacion
+      context: ./frontend
+      ## Donde se encuentra el dockerfile 
+      dockerfile: Dockerfile.pdn
+      ## Definimos variables de entorno para que sea tomada [en el dockerfile] desde el stage de build
+      args:
+        VITE_API_URL: http://137.184.14.66:3000
     ports:
-      - 80:5173
+      - 80:80
     volumes:
       - ./frontend/src:/app/src 
-    environment:
-      VITE_API_URL: http://137.184.14.66:3000
+
 
   # backend
   api:

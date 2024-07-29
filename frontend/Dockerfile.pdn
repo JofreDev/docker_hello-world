@@ -1,0 +1,30 @@
+## Se le asigna un alias, para despues referenciarla
+## Queremos crear una imagen lo suficientemente pequena para contener mi cod
+## Por lo tanto no necesitamos node, necesitamos un servidor web
+FROM node:20.5.0-alpine3.18 as build-stage
+
+## Referenciamos variable de entorno a usar en este stage
+ARG VITE_API_URL
+## Asignamos la referencia ahora si a la variable de entorno en dockerfile
+ENV VITE_API_URL=${VITE_API_URL}
+
+WORKDIR /app/
+COPY package*.json ./
+RUN npm install
+COPY . .
+## Ejecutamos un 'RUN' en vez de CMD para que se ejecute en construccion de imagen
+## Ejecutamos un build
+RUN ["npm", "run", "build"]
+
+# Paso 2 (Crear una imagen a partir de otra imagen)
+FROM nginx:1.25.1-alpine3.17-slim 
+## Tiene que copiar el cod que se genero en el stage 1
+## Referenciamos el stage 1 para eso (build-stage). Pero tambien referenciamos donde esta el build
+# Origen(build-stage) = /app/dist dest(nginx) =/usr/share/nginx/html
+COPY --from=build-stage /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g","daemon off;"]
+## No necesitamos manejar otro usuario diferente de manera oficial 
+#RUN addgroup react && adduser -S -G react react
+#RUN chown react:react /app
+#USER react
